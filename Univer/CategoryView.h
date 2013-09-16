@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "TouchXML.h"
+#import "Utils.h"
+#import "CDataManager.h"
+
+
 
 @interface CategoryView : UITableViewController<UISearchBarDelegate, UISearchDisplayDelegate>
 {
@@ -28,13 +32,25 @@
     UIActivityIndicatorView *spiner;
     UIAlertView *alert;
     
+    NSString *category;
+    NSString *id;
+    
+    NSDictionary *dic_;
+    
+    
 }
+
 
 - (void)reset;
 - (void)start_rss;
 - (NSString *)subtract:(NSString*)data;
 
 - (void)categoryRSSFeed:(NSString *)categoryAddress;
+
+
+@property (nonatomic, retain) NSString *category;
+@property (nonatomic, retain) NSString *id;
+@property (retain) NSDictionary *dic_;
 
 @property (assign) id delegate;
 @property (nonatomic, retain) NSString *address;

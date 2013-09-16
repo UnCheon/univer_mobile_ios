@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		99723C6417E63D110075D740 /* CDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 99F011CE17E63A0D005CAA34 /* CDataManager.m */; };
+		99F011C917E618BE005CAA34 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 99F011C817E618BE005CAA34 /* Utils.m */; };
+		99F011CC17E61C13005CAA34 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 99F011CB17E61C13005CAA34 /* JSONKit.m */; };
+		99F011CF17E63A0D005CAA34 /* CDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 99F011CE17E63A0D005CAA34 /* CDataManager.m */; };
 		BC0B48911643829100140C55 /* BoardCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = BC0B48901643829100140C55 /* BoardCell.xib */; };
 		BC0B48941643884E00140C55 /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0B48931643884D00140C55 /* test.png */; };
 		BC0B48991643887B00140C55 /* feed_cell_innerbox.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0B48951643887B00140C55 /* feed_cell_innerbox.png */; };
@@ -261,7 +265,25 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		99723C6317E63CE80075D740 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		99F011C717E618BE005CAA34 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		99F011C817E618BE005CAA34 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		99F011CA17E61C13005CAA34 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		99F011CB17E61C13005CAA34 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
+		99F011CD17E63A0D005CAA34 /* CDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDataManager.h; sourceTree = "<group>"; };
+		99F011CE17E63A0D005CAA34 /* CDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDataManager.m; sourceTree = "<group>"; };
 		BC0B48901643829100140C55 /* BoardCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BoardCell.xib; sourceTree = "<group>"; };
 		BC0B48931643884D00140C55 /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
 		BC0B48951643887B00140C55 /* feed_cell_innerbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = feed_cell_innerbox.png; sourceTree = "<group>"; };
@@ -808,8 +830,14 @@
 		BC5CE8D6162BE71700939539 /* AppDelegate */ = {
 			isa = PBXGroup;
 			children = (
+				99F011CD17E63A0D005CAA34 /* CDataManager.h */,
+				99F011CE17E63A0D005CAA34 /* CDataManager.m */,
+				99F011CA17E61C13005CAA34 /* JSONKit.h */,
+				99F011CB17E61C13005CAA34 /* JSONKit.m */,
 				BCC712E3161C7791007AC689 /* AppDelegate.h */,
 				BCC712E4161C7791007AC689 /* AppDelegate.m */,
+				99F011C717E618BE005CAA34 /* Utils.h */,
+				99F011C817E618BE005CAA34 /* Utils.m */,
 			);
 			name = AppDelegate;
 			sourceTree = "<group>";
@@ -1323,6 +1351,7 @@
 				BCC712CC161C7791007AC689 /* Sources */,
 				BCC712CD161C7791007AC689 /* Frameworks */,
 				BCC712CE161C7791007AC689 /* Resources */,
+				99723C6317E63CE80075D740 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1581,6 +1610,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99723C6417E63D110075D740 /* CDataManager.m in Sources */,
 				BCC712E1161C7791007AC689 /* main.m in Sources */,
 				BCC712E5161C7791007AC689 /* AppDelegate.m in Sources */,
 				BCC7130E161C797E007AC689 /* BooksViewController.m in Sources */,
@@ -1639,6 +1669,7 @@
 				BCAE5C731660BB94002645B7 /* MHLazyTableImages.m in Sources */,
 				BCF9E0591660D8C700DB71FA /* CustomCell.m in Sources */,
 				BCF9E0631660EC8400DB71FA /* CustomCmImageCell.m in Sources */,
+				99F011C917E618BE005CAA34 /* Utils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1647,6 +1678,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCC71300161C7791007AC689 /* UniverTests.m in Sources */,
+				99F011CC17E61C13005CAA34 /* JSONKit.m in Sources */,
+				99F011CF17E63A0D005CAA34 /* CDataManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

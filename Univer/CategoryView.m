@@ -10,6 +10,7 @@
 
 @implementation CategoryView
 @synthesize delegate, kinds, address, filteredListContent, spiner, alert;
+@synthesize category, id, dic_;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,10 +33,20 @@
 
 - (void)viewDidLoad
 {
+    
+    Utils *util = [Utils sharedUtils];
+    [util setDelegate:self];
+    [util getCategoryList:category id:id];
+    
+    
+    
+    
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"cm_navigation_background_2.jpg"] forBarMetrics:UIBarMetricsDefault];
 
     [super viewDidLoad];
     
+
+    /*
     [category_array removeAllObjects];
     [self.tableView reloadData];
     
@@ -57,9 +68,14 @@
     else if(kinds == 2)
         self.title = @"단과대 선택";
     
+    
     [NSThread detachNewThreadSelector:@selector(start_rss) toTarget:self withObject:nil];
     // Do any additional setup after loading the view from its nib.
+    
+    */
 }
+
+
 
 - (void)viewDidUnload
 {
@@ -109,7 +125,7 @@
         return [self.filteredListContent count];
     }else{
         NSDictionary *Dic = [sectionData objectAtIndex:section];
-        NSMutableArray *ar = [Dic objectForKey:@"title"];
+        NSMutableArray *ar = [Dic objectForKey:@"name"];
         return [ar count];
     }
 }
@@ -124,10 +140,10 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     if (tableView == self.searchDisplayController.searchResultsTableView) {
-        cell.textLabel.text = [[filteredListContent objectAtIndex:indexPath.row] objectForKey:@"title"];
+        cell.textLabel.text = [[filteredListContent objectAtIndex:indexPath.row] objectForKey:@"name"];
     }else{
         NSDictionary *Dic = [sectionData objectAtIndex:indexPath.section];
-        NSMutableArray *ar = [Dic objectForKey:@"title"];
+        NSMutableArray *ar = [Dic objectForKey:@"name"];
         cell.textLabel.text = [ar objectAtIndex:indexPath.row]; 
         
     }
@@ -142,50 +158,74 @@
     
     if (indexPath.section == 0 && indexPath.row == 0) {
         NSLog(@"전체선택");
-        if (kinds == 0){
+        if ([category isEqualToString:@"region"]){
             [userDefaults removeObjectForKey:@"region"];
             [userDefaults removeObjectForKey:@"university"];
             [userDefaults removeObjectForKey:@"college"];
         }
-        else if(kinds == 1){
+        else if([category isEqualToString:@"university"]){
             [userDefaults removeObjectForKey:@"university"];
             [userDefaults removeObjectForKey:@"college"];
         }
-        else if(kinds == 2){
+        else if([category isEqualToString:@"college"]){
             [userDefaults removeObjectForKey:@"college"];
         }
     }else{
         
-        NSDictionary *dic_;
+        self.dic_ = [[NSDictionary alloc] init];
+        
+        
+        
+        
+
         if (tableView == self.searchDisplayController.searchResultsTableView) {
             dic_ = [filteredListContent objectAtIndex:indexPath.row];
         }else{
             NSDictionary *dic = [sectionData objectAtIndex:indexPath.section];
-            NSMutableArray *title_array = [dic objectForKey:@"title"];
+            NSMutableArray *title_array = [dic objectForKey:@"name"];
             NSMutableArray *nick_array = [dic objectForKey:@"nick"];
             NSMutableArray *uni_id = [dic objectForKey:@"id"];
-            dic_ = [NSDictionary dictionaryWithObjectsAndKeys:[title_array objectAtIndex:indexPath.row], @"title", [nick_array objectAtIndex:indexPath.row], @"nick", [uni_id objectAtIndex:indexPath.row], @"id", nil];
+            dic_ = [NSDictionary dictionaryWithObjectsAndKeys:[title_array objectAtIndex:indexPath.row], @"name", [nick_array objectAtIndex:indexPath.row], @"nick", [uni_id objectAtIndex:indexPath.row], @"id", nil];
+
+            NSLog(@"%@", dic_);
+    
         }
+
         
-        if (kinds == 0){
-            [userDefaults setObject:dic_ forKey:@"region"];
-            [userDefaults removeObjectForKey:@"university"];
-            [userDefaults removeObjectForKey:@"college"];
+        CDataManager *dataManager = [CDataManager getDataManager];
+        if ([category isEqualToString:@"region"]){
+
+            [dataManager.data setObject:dic_ forKey:@"region"];
+            [dataManager.data removeObjectForKey:@"universiy"];
+            [dataManager.data removeObjectForKey:@"college"];
+
+//            [userDefaults setObject:dic_ forKey:@"region"];
+//            [userDefaults removeObjectForKey:@"university"];
+//            [userDefaults removeObjectForKey:@"college"];
         }
-        else if(kinds == 1){
-            [userDefaults setObject:dic_ forKey:@"university"];
-            [userDefaults removeObjectForKey:@"college"];
+        else if([category isEqualToString:@"university"]){
+            [dataManager.data setObject:dic_ forKey:@"university"];
+            [dataManager.data setObject:dic_ forKey:@"college"];
+            
+//            [userDefaults setObject:dic_ forKey:@"university"];
+//            [userDefaults removeObjectForKey:@"college"];
         }
-        else if(kinds == 2){
-            [userDefaults setObject:dic_ forKey:@"college"];
+        else if([category isEqualToString:@"college"]){
+            [dataManager.data setObject:dic_ forKey:@"college"];
+            
+//            [userDefaults setObject:dic_ forKey:@"college"];
         }
     }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"launch" object:self];
     
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
+
+
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)name atIndex:(NSInteger)index {
     if (index == 0) {
         [self.tableView setContentOffset:CGPointMake(0,0) animated: NO];
     }
@@ -193,7 +233,7 @@
     {
         NSDictionary *Dic = [sectionData objectAtIndex:i];
         NSString *sectionName = [Dic objectForKey:@"section_name"];
-        if([sectionName isEqualToString:title])
+        if([sectionName isEqualToString:name])
         {
             return i;
         }
@@ -279,7 +319,7 @@
 		NSString *pre = [Index objectAtIndex:i];
 		for(int j = 0; j < [name count]; j++)
 		{
-			NSString *str = [[name objectAtIndex:j] objectForKey:@"title"];
+			NSString *str = [[name objectAtIndex:j] objectForKey:@"name"];
             NSString *nick = [[name objectAtIndex:j] objectForKey:@"nick"];            
             NSString *id_string = [[name objectAtIndex:j] objectForKey:@"id"];            
 			if([pre isEqualToString:[self subtract:str]])
@@ -298,14 +338,14 @@
 	{
 		if([temp[i] count] != 0){
             
-			NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:[Index objectAtIndex:i], @"section_name", temp[i], @"title", temp_id[i], @"id", temp_nick[i], @"nick" ,nil];
+			NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:[Index objectAtIndex:i], @"section_name", temp[i], @"name", temp_id[i], @"id", temp_nick[i], @"nick" ,nil];
 			[sectionData addObject:data];
 		}
 	}
     
     NSArray *allArray = [NSArray arrayWithObject:@"전체선택"];
     
-    NSDictionary *allDic = [NSDictionary dictionaryWithObjectsAndKeys:@"★", @"section_name", allArray, @"title", @"", @"id", @"전체선택", @"nick", nil];
+    NSDictionary *allDic = [NSDictionary dictionaryWithObjectsAndKeys:@"★", @"section_name", allArray, @"name", @"", @"id", @"전체선택", @"nick", nil];
     [sectionData insertObject:allDic atIndex:0];
 
 }
@@ -318,7 +358,7 @@
     for (NSDictionary *dic in category_array)
     {
         // NSComparisonResult result = [person.name localizedCompare:searchText];
-        NSRange range = [[dic objectForKey:@"title"] rangeOfString:searchText];
+        NSRange range = [[dic objectForKey:@"name"] rangeOfString:searchText];
         if (range.location != NSNotFound)
         {
             [self.filteredListContent addObject:dic];
@@ -334,7 +374,7 @@
     return YES;
 }
 
-
+/*
 #pragma mark - Autoreleasepool rss
 
 - (void)start_rss
@@ -380,6 +420,17 @@
         }
         [category_array addObject:[newsItem copy]];
     }   
+}
+
+*/
+
+#pragma mark - Utils Delegate
+- (void)didFinishLoadingCategoryDaya:(NSMutableArray *)feedArray
+{
+    NSLog(@"%@", feedArray);
+    category_array = feedArray;
+    [self reset];
+    [self.tableView reloadData];
 }
 
 

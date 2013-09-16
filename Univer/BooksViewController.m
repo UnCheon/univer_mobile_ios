@@ -14,6 +14,7 @@
 #import "CustomCell.h"
 
 
+
 #define IMAGE_BASE                              @"http://54.249.52.26"
 #define BOOK_BASE_URL                            @"http://54.249.52.26/feeds/books/"
 #define CATEGORY_REGION                              @"http://54.249.52.26/feeds/region/"
@@ -186,25 +187,29 @@
 {
     [super viewDidAppear:YES];
     
-    region_dic = [userDefaults objectForKey:@"region"];
-    uni_dic = [userDefaults objectForKey:@"university"];
-    coll_dic = [userDefaults objectForKey:@"college"];
+    NSLog(@"%@", [userDefaults objectForKey:@"region"]);
+    CDataManager *dataManager = [CDataManager getDataManager];
+    
+    region_dic = [dataManager.data objectForKey:@"region"];
+    uni_dic = [dataManager.data objectForKey:@"university"];
+    coll_dic = [dataManager.data objectForKey:@"college"];
+    
     
     
     
     if (region_dic != nil) {
         if (uni_dic != nil) {
             if (coll_dic != nil) {
-                regionLabel.text = [region_dic objectForKey:@"title"];
-                universityLabel.text = [uni_dic objectForKey:@"title"];
-                collegeLabel.text = [coll_dic objectForKey:@"title"];
+                regionLabel.text = [region_dic objectForKey:@"name"];
+                universityLabel.text = [uni_dic objectForKey:@"name"];
+                collegeLabel.text = [coll_dic objectForKey:@"name"];
             }else{
-                regionLabel.text = [region_dic objectForKey:@"title"];
-                universityLabel.text = [uni_dic objectForKey:@"title"];
+                regionLabel.text = [region_dic objectForKey:@"name"];
+                universityLabel.text = [uni_dic objectForKey:@"name"];
                 collegeLabel.text = @"단과대선택";
             }
         }else{
-            regionLabel.text = [region_dic objectForKey:@"title"];
+            regionLabel.text = [region_dic objectForKey:@"name"];
             universityLabel.text = @"대학선택";
             collegeLabel.text = @"단과대선택";
         }
@@ -647,12 +652,18 @@
     categoryView.address = CATEGORY_REGION;
     categoryView.delegate = self;
     categoryView.kinds = 0;
+    categoryView.category = @"region";
+    categoryView.id = 0;
+    
     [self.navigationController pushViewController:categoryView animated:YES];
     
 }
 
 - (IBAction)universityBtn:(id)sender {
-    if (![userDefaults objectForKey:@"region"]) {
+    
+    CDataManager *dataManager = [CDataManager getDataManager];
+
+    if (![dataManager.data objectForKey:@"region"]) {
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"학교선택" message:@"지역을 먼저 선택하여야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
         [alertView show];
     }else{
@@ -660,18 +671,30 @@
         NSString *address = [CATEGORY_UNIVERSITY stringByAppendingFormat:@"%@/", [[userDefaults objectForKey:@"region"] objectForKey:@"id"]];
         categoryView.address = address;
         categoryView.kinds = 1;
+        
+        categoryView.category = @"university";
+        categoryView.id = [[dataManager.data objectForKey:@"region"] objectForKey:@"id"];
+        
+        
+        
         [self.navigationController pushViewController:categoryView animated:YES];
     }
 }
 
 - (IBAction)collegeBtn:(id)sender {
-    if (![userDefaults objectForKey:@"university"]) {
+    CDataManager *dataManager = [CDataManager getDataManager];
+    if (![dataManager.data objectForKey:@"university"]) {
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"학교를 먼저 선택하여야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
         [alertView show];
     }else{
         CategoryView *categoryView = [[CategoryView alloc] initWithNibName:@"CategoryView" bundle:nil];
         categoryView.address = [CATEGORY_COLLEGE stringByAppendingFormat:@"%@/", [[userDefaults objectForKey:@"university"] objectForKey:@"id"]];
         categoryView.kinds = 2;
+        
+        categoryView.category = @"college";
+        categoryView.id = [[dataManager.data objectForKey:@"university"] objectForKey:@"id"];
+        
+        
         [self.navigationController pushViewController:categoryView animated:YES];
     }
 }

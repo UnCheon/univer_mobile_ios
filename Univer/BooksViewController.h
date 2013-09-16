@@ -10,6 +10,7 @@
 #import "ODRefreshControl.h"
 #import "TouchXML.h"
 #import "MHLazyTableImages.h"
+#import "CDataManager.h"
 
 @class MHLazyTableImages;
 
