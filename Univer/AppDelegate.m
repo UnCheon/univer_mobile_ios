@@ -14,7 +14,7 @@
 #import "ASIFormDataRequest.h"
 #import "BoardsViewController.h"
 
-#define LOGIN_CHECK_URL                        @"http://54.248.233.34/login_check/"
+#define LOGIN_URL                        @"http://54.249.52.26/login/"
 
 
 
@@ -69,16 +69,14 @@
     
     if (![username isEqualToString:@""] && ![user_id isEqualToString:@""] && ![value isEqualToString:@""] && ![password isEqualToString:@""]) {
     
-//    if ([userDefaults objectForKey:@"username"] && [userDefaults objectForKey:@"password"] && ![userDefaults objectForKey:@"user_id"] && [userDefaults objectForKey:@"value"]) {
-        NSURL *url = [NSURL URLWithString:LOGIN_CHECK_URL];
+        NSURL *url = [NSURL URLWithString:LOGIN_URL];
         ASIFormDataRequest *request = [[ASIFormDataRequest alloc] initWithURL:url];
         
-        NSLog(@"%@, %@", user_id, value);
         [request setRequestMethod:@"POST"];
         [request setPostFormat:ASIMultipartFormDataPostFormat];
         [request setShouldContinueWhenAppEntersBackground:YES];
-        [request setPostValue:user_id forKey:@"user_id"];
-        [request setPostValue:value forKey:@"value"];
+        [request setPostValue:username forKey:@"username"];
+        [request setPostValue:password forKey:@"password"];
         [request setDelegate:self];
         [request startAsynchronous];
     }else{

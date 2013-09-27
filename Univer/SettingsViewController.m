@@ -77,7 +77,7 @@
 
 - (NSURL*)lazyImageURLForIndexPath:(NSIndexPath*)indexPath
 {
-	return [NSURL URLWithString:@"http://54.248.233.34/media/documents/2012/11/24/photo.50x50.jpg"];
+	return [NSURL URLWithString:@"http://54.249.52.26/media/documents/2012/11/24/photo.50x50.jpg"];
 }
 
 - (UIImage*)postProcessLazyImage:(UIImage*)image forIndexPath:(NSIndexPath*)indexPath

@@ -254,7 +254,7 @@
     @autoreleasepool {
             [uniArray removeAllObjects];
             NSString *feedAddress = [NSString stringWithFormat:@"%@%@/", CHATROOM_URL, [userDefaults objectForKey:@"user_id"]];
-            [self uniRSSFeed:feedAddress];
+//            [self uniRSSFeed:feedAddress];
             [self.uniTableView reloadData];
             isParsing = NO;
     }
