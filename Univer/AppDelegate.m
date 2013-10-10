@@ -67,7 +67,8 @@
     
     NSLog(@"%@, %@, %@, %@", username, user_id, value, password);
     
-    if (![username isEqualToString:@""] && ![user_id isEqualToString:@""] && ![value isEqualToString:@""] && ![password isEqualToString:@""]) {
+//    if (![username isEqualToString:@""] && ![user_id isEqualToString:@""] && ![value isEqualToString:@""] && ![password isEqualToString:@""]) {
+    if(1){
     
         NSURL *url = [NSURL URLWithString:LOGIN_URL];
         ASIFormDataRequest *request = [[ASIFormDataRequest alloc] initWithURL:url];
@@ -75,8 +76,8 @@
         [request setRequestMethod:@"POST"];
         [request setPostFormat:ASIMultipartFormDataPostFormat];
         [request setShouldContinueWhenAppEntersBackground:YES];
-        [request setPostValue:username forKey:@"username"];
-        [request setPostValue:password forKey:@"password"];
+        [request setPostValue:@"1" forKey:@"username"];
+        [request setPostValue:@"1" forKey:@"password"];
         [request setDelegate:self];
         [request startAsynchronous];
     }else{
