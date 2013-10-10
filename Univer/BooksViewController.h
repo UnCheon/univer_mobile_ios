@@ -12,6 +12,8 @@
 #import "MHLazyTableImages.h"
 #import "CDataManager.h"
 
+#import "Utils.h"
+
 @class MHLazyTableImages;
 
 
@@ -46,6 +48,8 @@
     BOOL is_search;
     BOOL is_segment;
     
+    BOOL is_reload;
+    
     UIButton *regionBtn;
     UIButton *universityBtn;
     UIButton *collegeBtn;
@@ -79,6 +83,8 @@
 
 - (void)segBtn:(UIButton *)btn;
 
+
+- (void)getBookList;
 
 
 

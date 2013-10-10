@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "TouchXML.h"
 #import "MHLazyTableImages.h"
+#import "Utils.h"
 
 @class MHLazyTableImages;
 
@@ -23,6 +24,8 @@
     NSString *entriesAddress;
     UIImage *image;
     NSDictionary *dic;
+    
+    int page;
     
     BOOL isParse;
     

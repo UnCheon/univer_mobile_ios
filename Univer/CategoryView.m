@@ -155,20 +155,22 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    CDataManager *dataManager = [CDataManager getDataManager];
     
     if (indexPath.section == 0 && indexPath.row == 0) {
         NSLog(@"전체선택");
         if ([category isEqualToString:@"region"]){
-            [userDefaults removeObjectForKey:@"region"];
-            [userDefaults removeObjectForKey:@"university"];
-            [userDefaults removeObjectForKey:@"college"];
+            
+            [dataManager.data removeObjectForKey:@"region"];
+            [dataManager.data removeObjectForKey:@"university"];
+            [dataManager.data removeObjectForKey:@"college"];
         }
         else if([category isEqualToString:@"university"]){
-            [userDefaults removeObjectForKey:@"university"];
-            [userDefaults removeObjectForKey:@"college"];
+            [dataManager.data removeObjectForKey:@"university"];
+            [dataManager.data removeObjectForKey:@"college"];
         }
         else if([category isEqualToString:@"college"]){
-            [userDefaults removeObjectForKey:@"college"];
+            [dataManager.data removeObjectForKey:@"college"];
         }
     }else{
         
@@ -196,28 +198,19 @@
         if ([category isEqualToString:@"region"]){
 
             [dataManager.data setObject:dic_ forKey:@"region"];
-            [dataManager.data removeObjectForKey:@"universiy"];
+            [dataManager.data removeObjectForKey:@"university"];
             [dataManager.data removeObjectForKey:@"college"];
-
-//            [userDefaults setObject:dic_ forKey:@"region"];
-//            [userDefaults removeObjectForKey:@"university"];
-//            [userDefaults removeObjectForKey:@"college"];
         }
         else if([category isEqualToString:@"university"]){
             [dataManager.data setObject:dic_ forKey:@"university"];
-            [dataManager.data setObject:dic_ forKey:@"college"];
-            
-//            [userDefaults setObject:dic_ forKey:@"university"];
-//            [userDefaults removeObjectForKey:@"college"];
+            [dataManager.data removeObjectForKey:@"college"];
         }
         else if([category isEqualToString:@"college"]){
             [dataManager.data setObject:dic_ forKey:@"college"];
-            
-//            [userDefaults setObject:dic_ forKey:@"college"];
         }
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"launch" object:self];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"launch" object:self];
     
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -374,58 +367,8 @@
     return YES;
 }
 
-/*
-#pragma mark - Autoreleasepool rss
-
-- (void)start_rss
-{
-    @autoreleasepool {
-        
-        
-        [self categoryRSSFeed:address];
-        [self reset];
-        [self.tableView reloadData];
-        [alert dismissWithClickedButtonIndex:0 animated:YES];
-        
-    }
-}
-
-
-#pragma mark - RSSFeed
-
-- (void)categoryRSSFeed:(NSString *)categoryAddress
-{
-    category_array = [[NSMutableArray alloc] initWithCapacity:10];	
-	
-    NSURL *url = [NSURL URLWithString: categoryAddress];
-    
-	NSError *error = nil;
-    CXMLDocument *rssParser = [[CXMLDocument alloc] initWithContentsOfURL:url options:0 error:&error];
-    
-    if (error) {
-        
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"학교정보" message:@"네트워크상태를 확인하세요" delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-        [alertView show];
-    }
-    
-    NSArray *resultNodes = NULL;
-    
-    resultNodes = [rssParser nodesForXPath:@"//item" error:nil];
-	
-    for (CXMLElement *resultElement in resultNodes) {
-        NSMutableDictionary *newsItem = [[NSMutableDictionary alloc] init];
-        int counter;
-        for(counter = 0; counter < [resultElement childCount]; counter++) {
-            [newsItem setObject:[[resultElement childAtIndex:counter] stringValue] forKey:[[resultElement childAtIndex:counter] name]];
-        }
-        [category_array addObject:[newsItem copy]];
-    }   
-}
-
-*/
-
 #pragma mark - Utils Delegate
-- (void)didFinishLoadingCategoryDaya:(NSMutableArray *)feedArray
+- (void)didFinishLoadingCategoryData:(NSMutableArray *)feedArray
 {
     NSLog(@"%@", feedArray);
     category_array = feedArray;

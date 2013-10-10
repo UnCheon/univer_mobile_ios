@@ -10,6 +10,7 @@
 #import "UIKeyboardToolbar.h"
 #import "ZBarSDK.h"
 #import "TouchXML.h"
+#import "CDataManager.h"
 
 @interface RegisterBookViewController : UIKeyboardToolbar<UIScrollViewDelegate, UIActionSheetDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate, UITextViewDelegate, ZBarReaderDelegate, UINavigationBarDelegate>
 {
@@ -67,9 +68,12 @@
 
 - (IBAction)photo_btn:(id)sender;
 
-- (IBAction)region_btn:(id)sender;
-- (IBAction)university_btn:(id)sender;
-- (IBAction)college_btn:(id)sender;
+
+
+- (IBAction)regionBtn:(id)sender;
+- (IBAction)universityBtn:(id)sender;
+- (IBAction)collegeBtn:(id)sender;
+
 
 - (IBAction)register_btn:(id)sender;
 

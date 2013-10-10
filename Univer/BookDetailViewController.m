@@ -87,13 +87,16 @@
 
 
     lazyImages.tableView = self.bookTableView;
-
+    page = 1;
     
     [super viewDidLoad];
+    
     self.title = [dic objectForKey:@"title"];
     entriesArray = [[NSMutableArray alloc] initWithCapacity:10];
     
-    [NSThread detachNewThreadSelector:@selector(start_rss) toTarget:self withObject:nil];
+    
+    [self getBookList];
+//    [NSThread detachNewThreadSelector:@selector(start_rss) toTarget:self withObject:nil];
     
     userDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -155,7 +158,7 @@
     if (section == 0)
         return @"";
     else
-        return @"판매자의 다른상품 보기";
+        return @"판매자의 다른상품";
 }
 
 
@@ -557,56 +560,11 @@
     NSLog(@"selected");
     if (indexPath.section == 1) {
         self.dic = [entriesArray objectAtIndex:indexPath.row];
+        NSLog(@"%@", [dic objectForKey:@"title"]);
         [self.bookTableView reloadData];
         [self.bookTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionNone animated:YES];
     }
 }
-
-#pragma mark - RSSFeed
-
-- (void)entriesRSSFeed:(NSString *)address
-{
-	[entriesArray removeAllObjects];
-    
-    NSURL *url = [NSURL URLWithString:address];
-	
-	NSError *error = nil;
-    CXMLDocument *rssParser = [[CXMLDocument alloc] initWithContentsOfURL:url options:0 error:&error];
-    
-    if (error) {
-        
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"판매자의 다른물품 보기" message:@"네트워크상태를 확인하세요" delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-        return;
-    }
-    
-    
-    NSArray *resultNodes = NULL;
-    
-    resultNodes = [rssParser nodesForXPath:@"//item" error:nil];
-    for (CXMLElement *resultElement in resultNodes) {
-        NSMutableDictionary *newsItem = [[NSMutableDictionary alloc] init];
-        int counter;
-        for(counter = 0; counter < [resultElement childCount]; counter++) {
-            [newsItem setObject:[[resultElement childAtIndex:counter] stringValue] forKey:[[resultElement childAtIndex:counter] name]];
-        }
-        [entriesArray addObject:[newsItem copy]];
-    }
-}
-
-#pragma mark Autoreleasepool rss
-
-- (void)start_rss
-{
-    @autoreleasepool {
-        entriesAddress = [FEED_BOOKS stringByAppendingFormat:@"search=0&sale=2&category=6&id=%@&page=1/", [dic objectForKey:@"seller_id"]];
-        NSLog(@"%@", entriesAddress);
-        [self entriesRSSFeed:entriesAddress];
-        [self.bookTableView reloadData];
-        
-    }
-}
-
-
 
 
 - (IBAction)segment_btn:(id)sender
@@ -704,6 +662,35 @@
     UIAlertView *myAlert = [[UIAlertView alloc] initWithTitle:@"3g, wifi상태를 확인해보시기 바랍니다."  message:nil delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
     [myAlert show];
 }
+
+
+
+- (void)getBookList
+{
+    Utils *util = [Utils sharedUtils];
+    util.delegate = self;
+    
+    NSString *pageString = [NSString stringWithFormat:@"%d", page];
+    
+    [util getBookList:@"true" category:@"yours" id:[dic objectForKey:@"seller_id"] page:pageString];
+
+}
+
+#pragma mark - Utils Delegate
+- (void)didFinishLoadingBookData:(NSMutableArray *)feedArray
+{
+    NSLog(@"feedarray = %@ count=%d", feedArray, [feedArray count]);
+    
+    entriesArray = feedArray;
+//    if (is_reload) {
+//        [entriesArray removeAllObjects];
+//    }
+//    [entriesArray addObjectsFromArray:feedArray];
+    
+    //    uniArray = feedArray;
+    [self.bookTableView reloadData];
+}
+
 
 
 

@@ -15,11 +15,12 @@
 
 @protocol UtilsDelegate <NSObject>
 
+// category
+- (void)didFinishLoadingCategoryData:(NSMutableArray *)feedArray;
 
-- (void)didFinishLoadingCategoryDaya:(NSMutableArray *)feedArray;
-- (void)didFinishLoadingRegionData:(NSMutableArray *)feedArray;
-- (void)didFinishLoadingUniversityData:(NSMutableArray *)feedArray;
-- (void)didFinishLoadingCollegeData:(NSMutableArray *)feedArray;
+// book
+- (void)didFinishLoadingBookData:(NSMutableArray *)feedArray;
+
 
 @end
 
@@ -28,28 +29,27 @@
 @interface Utils : NSObject{
     id delegate;
     
-    NSArray *regionArray;
-    NSArray *universityArray;
-    NSArray *collegeArray;
     NSMutableArray *categoryArray;
+    
+    NSMutableArray *bookArray;
 }
 
 @property (nonatomic, retain) id delegate;
-@property (nonatomic, retain) NSArray *regionArray;
-@property (nonatomic, retain) NSArray *universityArray;
-@property (nonatomic, retain) NSArray *collegeArray;
-@property (nonatomic, retain) NSArray *categoryArray;
+@property (nonatomic, retain) NSMutableArray *categoryArray;
+
+@property (nonatomic, retain) NSMutableArray *bookArray;
 
 + (Utils *)sharedUtils;
 + (id)alloc;
 + (id)init;
 
+// category
 - (void)getRegionList;
 - (void)getUniversityList:(int)regionId;
 - (void)getCollegeList:(int)universityId;
-- (void)getCategoryList:(NSString *)category id:(NSString *)id;
-
-
+- (void)getCategoryList:(NSString *)category id:(NSString *)categoryId;
+// book 
+- (void)getBookList:(NSString *)sale category:(NSString *)category id:(NSString *)categoryId page:(NSString *)page;
 
 
 

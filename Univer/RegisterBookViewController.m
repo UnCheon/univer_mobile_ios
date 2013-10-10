@@ -148,25 +148,29 @@
     [super viewDidAppear:YES];
     [scrollView setContentOffset:CGPointMake(0, 0)];
 
-    region_dic = [userDefaults objectForKey:@"region"];
-    uni_dic = [userDefaults objectForKey:@"university"];
-    coll_dic = [userDefaults objectForKey:@"college"];
+    
+    CDataManager *dataManager = [CDataManager getDataManager];
+    
+    region_dic = [dataManager.data objectForKey:@"region"];
+    uni_dic = [dataManager.data objectForKey:@"university"];
+    coll_dic = [dataManager.data objectForKey:@"college"];
+    
     
     
     
     if (region_dic != nil) {
         if (uni_dic != nil) {
             if (coll_dic != nil) {
-                regionLabel.text = [region_dic objectForKey:@"title"];
-                universityLabel.text = [uni_dic objectForKey:@"title"];
-                collegeLabel.text = [coll_dic objectForKey:@"title"];
+                regionLabel.text = [region_dic objectForKey:@"name"];
+                universityLabel.text = [uni_dic objectForKey:@"nick"];
+                collegeLabel.text = [coll_dic objectForKey:@"nick"];
             }else{
-                regionLabel.text = [region_dic objectForKey:@"title"];
-                universityLabel.text = [uni_dic objectForKey:@"title"];
+                regionLabel.text = [region_dic objectForKey:@"name"];
+                universityLabel.text = [uni_dic objectForKey:@"nick"];
                 collegeLabel.text = @"단과대학";
             }
         }else{
-            regionLabel.text = [region_dic objectForKey:@"title"];
+            regionLabel.text = [region_dic objectForKey:@"name"];
             universityLabel.text = @"대학교";
             collegeLabel.text = @"단과대학";
         }
@@ -217,51 +221,53 @@
 
 #pragma mark - Category Button & Photo Button
 
-- (IBAction)region_btn:(id)sender
-{
-    CategoryView *categoryView = [[CategoryView alloc] initWithNibName:@"CategoryView" bundle:nil];
-    
+
+
+- (IBAction)regionBtn:(id)sender {
+    CategoryView *categoryView = [[CategoryView alloc] initWithNibName:@"CategoryView"bundle:nil];
     categoryView.address = CATEGORY_REGION;
     categoryView.delegate = self;
     categoryView.kinds = 0;
+    categoryView.category = @"region";
+    categoryView.id = 0;
     
     [self.navigationController pushViewController:categoryView animated:YES];
     
-    
 }
 
-- (IBAction)university_btn:(id)sender
-{
-    if (region_dic == nil) {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"학교 선택" message:@"지역을 먼저 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
+- (IBAction)universityBtn:(id)sender {
+    
+    CDataManager *dataManager = [CDataManager getDataManager];
+    
+    if (![dataManager.data objectForKey:@"region"]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"학교선택" message:@"지역을 먼저 선택하여야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
         [alertView show];
-        return;
     }else{
-        
         CategoryView *categoryView = [[CategoryView alloc] initWithNibName:@"CategoryView" bundle:nil];
-        
-        categoryView.delegate = self;
+        NSString *address = [CATEGORY_UNIVERSITY stringByAppendingFormat:@"%@/", [[userDefaults objectForKey:@"region"] objectForKey:@"id"]];
+        categoryView.address = address;
         categoryView.kinds = 1;
         
-        categoryView.address = [CATEGORY_UNIVERSITY stringByAppendingFormat:@"%@/", [region_dic objectForKey:@"id"]];
+        categoryView.category = @"university";
+        categoryView.id = [[dataManager.data objectForKey:@"region"] objectForKey:@"id"];
         
         [self.navigationController pushViewController:categoryView animated:YES];
     }
 }
 
-
-- (IBAction)college_btn:(id)sender
-{
-    if (uni_dic == nil) {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"단과대학 선택" message:@"대학교를 먼저 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
+- (IBAction)collegeBtn:(id)sender {
+    CDataManager *dataManager = [CDataManager getDataManager];
+    if (![dataManager.data objectForKey:@"university"]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"학교를 먼저 선택하여야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
         [alertView show];
-        return;
     }else{
         CategoryView *categoryView = [[CategoryView alloc] initWithNibName:@"CategoryView" bundle:nil];
-        
-        categoryView.address = [CATEGORY_COLLEGE stringByAppendingFormat:@"%@/", [uni_dic objectForKey:@"id"]];
-        categoryView.delegate = self;
+        categoryView.address = [CATEGORY_COLLEGE stringByAppendingFormat:@"%@/", [[userDefaults objectForKey:@"university"] objectForKey:@"id"]];
         categoryView.kinds = 2;
+        
+        categoryView.category = @"college";
+        categoryView.id = [[dataManager.data objectForKey:@"university"] objectForKey:@"id"];
+        
         
         [self.navigationController pushViewController:categoryView animated:YES];
     }
@@ -513,13 +519,6 @@
         [alertView show];
         
     }else{
-        alert = [[UIAlertView alloc] initWithTitle:@"잠시만 기다려 주세요.." message:nil delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
-        [alert show];
-        
-        spiner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        spiner.center = CGPointMake(alert.bounds.size.width/2, alert.bounds.size.height/2+10);
-        [spiner startAnimating];
-        [alert addSubview:spiner];
         
         NSString *book_title = title_field.text;
         NSString *publisher = publisher_field.text;
@@ -529,35 +528,30 @@
         NSString *discount_price = [discount_field.text stringByAppendingString:@""];
         NSString *content = content_view.text;
         
-        NSString *region_id = [[userDefaults objectForKey:@"region"] objectForKey:@"id"];
-        NSString *uni_id = [[userDefaults objectForKey:@"university"] objectForKey:@"id"];
-        NSString *college_id = [[userDefaults objectForKey:@"college"] objectForKey:@"id"];
+        CDataManager *dataManager = [CDataManager getDataManager];
         
-        if ([region_id isEqualToString:@""] || [uni_id isEqualToString:@""] ||[college_id isEqualToString:@""]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"지역, 학교, 단과대학을 모두 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-            [alert show];
-            return;
-        }
-        if (![userDefaults objectForKey:@"region"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"지역, 학교, 단과대학을 모두 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-            [alert show];
-            return;
-        }
-        if (![userDefaults objectForKey:@"university"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"지역, 학교, 단과대학을 모두 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-            [alert show];
-            return;
-        }
+        NSString *region_id = [[dataManager.data objectForKey:@"region"] objectForKey:@"id"];
+        NSString *uni_id = [[dataManager.data objectForKey:@"university"] objectForKey:@"id"];
+        NSString *college_id = [[dataManager.data objectForKey:@"college"] objectForKey:@"id"];
+        
+                
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"지역, 학교, 단과대학을 모두 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
 
-        if (![userDefaults objectForKey:@"college"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"카테고리" message:@"지역, 학교, 단과대학을 모두 선택해야 합니다." delegate:self cancelButtonTitle:@"확인" otherButtonTitles:nil];
-            [alert show];
+        if (![dataManager.data objectForKey:@"region"]) {
+            [alertView show];
+            return;
+        }
+        if (![dataManager.data objectForKey:@"university"]) {
+            [alertView show];
+            return;
+        }
+        if (![dataManager.data objectForKey:@"college"]) {
+            [alertView show];
             return;
         }
 
 
-        
-        
+          
         NSString *sale = @"1";
         NSString *parcel;
         NSString *meet;
@@ -605,7 +599,14 @@
             [request setData:imageData withFileName:fileName andContentType:@"image/jpeg" forKey:@"image"];
         }
         
+        alert = [[UIAlertView alloc] initWithTitle:@"잠시만 기다려 주세요.." message:nil delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
+        [alert show];
         
+        spiner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        spiner.center = CGPointMake(alert.bounds.size.width/2, alert.bounds.size.height/2+10);
+        [spiner startAnimating];
+        [alert addSubview:spiner];
+
         [request setDelegate:self];
         [request startAsynchronous];
     }

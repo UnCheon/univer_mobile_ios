@@ -46,8 +46,8 @@
     if (self) {
 //        self.title = @"books";
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launch:) name:@"launch" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launch:) name:@"reloadBook" object:nil];
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launch:) name:@"launch" object:nil];
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launch:) name:@"reloadBook" object:nil];
 
 
         
@@ -178,6 +178,12 @@
     
     [refreshControl addTarget:self action:@selector(dropViewDidBeginRefreshing:) forControlEvents:UIControlEventValueChanged];
     
+    
+    sell_url = @"true";
+    page = 1;
+    is_reload = TRUE;
+    
+    [self getBookList];
 //	self.tableView.rowHeight = 80;
 
     
@@ -187,16 +193,13 @@
 {
     [super viewDidAppear:YES];
     
-    NSLog(@"%@", [userDefaults objectForKey:@"region"]);
     CDataManager *dataManager = [CDataManager getDataManager];
     
     region_dic = [dataManager.data objectForKey:@"region"];
     uni_dic = [dataManager.data objectForKey:@"university"];
     coll_dic = [dataManager.data objectForKey:@"college"];
     
-    
-    
-    
+        
     if (region_dic != nil) {
         if (uni_dic != nil) {
             if (coll_dic != nil) {
@@ -229,7 +232,6 @@
 
 - (void)launch:(NSNotification *)notification
 {
-    [NSThread detachNewThreadSelector:@selector(threadStart) toTarget:self withObject:nil];
 
 }
 
@@ -238,7 +240,9 @@
 - (void)dropViewDidBeginRefreshing:(ODRefreshControl *)_refreshControl
 {
     double delayInSeconds = 1.0;
-    [NSThread detachNewThreadSelector:@selector(threadStart) toTarget:self withObject:nil];
+    is_reload = TRUE;
+    page = 1;
+    [self getBookList];
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         
@@ -411,12 +415,12 @@
     
     priceLabel.text = [NSString stringWithFormat:@"%@원", [dic objectForKey:@"discount_price"]];
     
-    
     if ([[dic objectForKey:@"parcel"] isEqualToString:@"0"])
         parcelImageView.image = [UIImage imageNamed:@"bk_parcel_false.png"];
     else
         parcelImageView.image = [UIImage imageNamed:@"bk_parcel_true.png"];
     
+
     if ([[dic objectForKey:@"meet"] isEqualToString:@"0"])
         meetImageView.image = [UIImage imageNamed:@"bk_meet_false.png"];
     else
@@ -500,7 +504,7 @@
     
 
     
-    if ([sell_url isEqualToString:@"3"] || [[passDic objectForKey:@"seller_id"] isEqualToString:my_id]) {
+    if ([sell_url isEqualToString:@"mine"] || [[passDic objectForKey:@"seller_id"] isEqualToString:my_id]) {
         bookDetailViewCtr.hidesBottomBarWhenPushed = YES;
     }
     
@@ -513,7 +517,7 @@
 
 
 
-
+/*
 #pragma - RSS
 
 - (void)threadStart
@@ -634,7 +638,7 @@
         category_url = @"0";
         id_url = @"0";
     }
-    if ([sell_url isEqualToString:@"3"]) {
+    if ([sell_url isEqualToString:@"mine"]) {
         category_url = @"5";
         id_url = [userDefaults objectForKey:@"user_id"];
     }
@@ -643,7 +647,7 @@
     
     return returnAddress;
 }
-
+*/
 
 #pragma - Category Button
 
@@ -707,23 +711,25 @@
         [segBtn2 setImage:[UIImage imageNamed:@"bk_purchase_unselected.png"] forState:UIControlStateNormal];
         [segBtn3 setImage:[UIImage imageNamed:@"bk_my_unselected.png"] forState:UIControlStateNormal];
 
-        sell_url = @"1";
+        sell_url = @"true";
         
     }else if (btn.tag == 2){
         [segBtn1 setImage:[UIImage imageNamed:@"bk_sale_unselected.png"] forState:UIControlStateNormal];
         [segBtn2 setImage:[UIImage imageNamed:@"bk_purchase_selected.png"] forState:UIControlStateNormal];
         [segBtn3 setImage:[UIImage imageNamed:@"bk_my_unselected.png"] forState:UIControlStateNormal];
 
-        sell_url = @"0";
+        sell_url = @"false";
     }else if (btn.tag == 3){
         [segBtn1 setImage:[UIImage imageNamed:@"bk_sale_unselected.png"] forState:UIControlStateNormal];
         [segBtn2 setImage:[UIImage imageNamed:@"bk_purchase_unselected.png"] forState:UIControlStateNormal];
         [segBtn3 setImage:[UIImage imageNamed:@"bk_my_selected.png"] forState:UIControlStateNormal];
 
-        sell_url = @"3";
-        category_url = @"5";
+        sell_url = @"mine";
+        category_url = @"mine";
     }
-    [NSThread detachNewThreadSelector:@selector(threadStart) toTarget:self withObject:nil];
+    is_reload = TRUE;
+    [self getBookList];
+//    [NSThread detachNewThreadSelector:@selector(getBookList) toTarget:self withObject:nil];
 
 }
 
@@ -746,15 +752,65 @@
         int position = page*(ENTRYCOUNT*80-self.uniTableView.bounds.size.height);
         if (scrollView.contentOffset.y > position) {
             page +=1;
-            [NSThread detachNewThreadSelector:@selector(updateThreadStart) toTarget:self withObject:nil];
+            is_reload = FALSE;
+            [self getBookList];
+//            [NSThread detachNewThreadSelector:@selector(updateThreadStart) toTarget:self withObject:nil];
         }
     }
 }
 
-- (void)test:(id)sender
+
+
+
+- (void)getBookList
 {
-    [self.uniTableView reloadData];
+    Utils *util = [Utils sharedUtils];
+    util.delegate = self;
     
+    NSString *pageString = [NSString stringWithFormat:@"%d", page];
+    NSLog(@"page = %@", pageString);
+    if (region_dic != nil) {
+        if (uni_dic != nil) {
+            if (coll_dic != nil) {
+                if ([sell_url isEqualToString:@"mine"])
+                    [util getBookList:sell_url category:@"mine" id:@"none" page:pageString];
+                else
+                    [util getBookList:sell_url category:@"college" id:[coll_dic objectForKey:@"id"] page:pageString];
+            }else{
+                if ([sell_url isEqualToString:@"mine"])
+                    [util getBookList:sell_url category:@"mine" id:@"none" page:pageString];
+                else
+                    [util getBookList:sell_url category:@"university" id:[uni_dic objectForKey:@"id"] page:pageString];
+            }
+        }else{
+            if ([sell_url isEqualToString:@"mine"])
+                [util getBookList:sell_url category:@"mine" id:@"none" page:pageString];
+            else
+                [util getBookList:sell_url category:@"region" id:[region_dic objectForKey:@"id"] page:pageString];
+            
+        }
+    }else{
+        if ([sell_url isEqualToString:@"mine"])
+            [util getBookList:@"true" category:@"mine" id:@"1" page:pageString];
+        else
+            [util getBookList:sell_url category:@"all" id:@"all" page:pageString];
+    }
 }
+
+#pragma mark - Utils Delegate
+- (void)didFinishLoadingBookData:(NSMutableArray *)feedArray
+{
+    NSLog(@"feedarray = %@ count=%d", feedArray, [feedArray count]);
+    if (is_reload) {
+        [uniArray removeAllObjects];
+    }
+    [uniArray addObjectsFromArray:feedArray];
+    
+//    uniArray = feedArray;
+    [refreshControl endRefreshing];
+    [self.uniTableView reloadData];
+}
+
+
 
 @end
